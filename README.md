@@ -101,4 +101,4 @@ MIT License
 
 ## Contributing
 
-Feel free to open issues, ideas or submit pull requests. # kit
+Feel free to open issues, ideas or submit pull requests. 

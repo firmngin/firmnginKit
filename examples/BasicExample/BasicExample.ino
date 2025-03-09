@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include "firmnginKit.h"
 #include <WiFi.h>
 
