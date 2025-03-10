@@ -61,7 +61,8 @@ FirmnginKit::FirmnginKit(const char *deviceId, const char *deviceKey)
     }
 }
 
-bool FirmnginKit::initializingDevice(const char* url, String& response, const char* method, String payload) {
+bool FirmnginKit::initializingDevice(const char *url, String &response, const char *method, String payload)
+{
 
     bool success = false;
 #if defined(ESP8266)
@@ -73,25 +74,37 @@ bool FirmnginKit::initializingDevice(const char* url, String& response, const ch
     http.begin(client, url);
 
     int httpCode = 0;
-    if (strcmp(method, "GET") == 0) {
+    if (strcmp(method, "GET") == 0)
+    {
         httpCode = http.GET();
-    } else if (strcmp(method, "POST") == 0) {
+    }
+    else if (strcmp(method, "POST") == 0)
+    {
         http.addHeader("Content-Type", "application/json");
         httpCode = http.POST(payload);
-    } else if (strcmp(method, "PUT") == 0) {
+    }
+    else if (strcmp(method, "PUT") == 0)
+    {
         http.addHeader("Content-Type", "application/json");
         httpCode = http.PUT(payload);
-    } else if (strcmp(method, "DELETE") == 0) {
+    }
+    else if (strcmp(method, "DELETE") == 0)
+    {
         httpCode = http.sendRequest("DELETE", payload);
     }
 
-    if (httpCode > 0) {
-        if (httpCode == HTTP_CODE_OK) {
+    if (httpCode > 0)
+    {
+        if (httpCode == HTTP_CODE_OK)
+        {
             response = http.getString();
             success = true;
         }
-    } else {
-        if (_debug) {
+    }
+    else
+    {
+        if (_debug)
+        {
             Serial.print("HTTP Request failed, error: ");
             Serial.println(http.errorToString(httpCode));
         }
@@ -108,26 +121,38 @@ bool FirmnginKit::initializingDevice(const char* url, String& response, const ch
     http.begin(url);
 
     int httpCode = 0;
-    if (strcmp(method, "GET") == 0) {
+    if (strcmp(method, "GET") == 0)
+    {
         httpCode = http.GET();
-    } else if (strcmp(method, "POST") == 0) {
+    }
+    else if (strcmp(method, "POST") == 0)
+    {
         http.addHeader("Content-Type", "application/json");
         httpCode = http.POST(payload);
-    } else if (strcmp(method, "PUT") == 0) {
+    }
+    else if (strcmp(method, "PUT") == 0)
+    {
         http.addHeader("Content-Type", "application/json");
         httpCode = http.PUT(payload);
-    } else if (strcmp(method, "DELETE") == 0) {
+    }
+    else if (strcmp(method, "DELETE") == 0)
+    {
         httpCode = http.sendRequest("DELETE", payload);
     }
 
-    if (httpCode > 0) {
-        if (httpCode == HTTP_CODE_OK) {
+    if (httpCode > 0)
+    {
+        if (httpCode == HTTP_CODE_OK)
+        {
             response = http.getString();
             Serial.println("Device initialized");
             success = true;
         }
-    } else {
-        if (_debug) {
+    }
+    else
+    {
+        if (_debug)
+        {
             Serial.print("Initializing device failed, error: ");
             Serial.println(http.errorToString(httpCode));
             return false;
@@ -167,7 +192,8 @@ void FirmnginKit::begin()
         return;
     }
 
-    if(WiFi.status() != WL_CONNECTED) {
+    if (WiFi.status() != WL_CONNECTED)
+    {
         Serial.println("ERROR: WiFi not connected");
         Serial.println("Restarting ESP...");
         delay(2000);
@@ -179,29 +205,39 @@ void FirmnginKit::begin()
 
     String response;
     Serial.println("Initializing device");
-    if (initializingDevice(("https://dev.firmngin.cloud/v1/device/init/" + String(_deviceId)).c_str(), response)) {
+    if (initializingDevice(("https://dev.firmngin.cloud/v1/device/init/" + String(_deviceId)).c_str(), response))
+    {
 
         DynamicJsonDocument doc(4096);
         DeserializationError error = deserializeJson(doc, response);
 
-        if (!error) {
-            if (doc.containsKey("srv")) {
-                MQ_SERVER = doc["srv"].as<const char*>();
+        if (!error)
+        {
+            if (doc.containsKey("srv"))
+            {
+                MQ_SERVER = doc["srv"].as<const char *>();
             }
-            if (doc.containsKey("prt")) {
+            if (doc.containsKey("prt"))
+            {
                 MQ_PORT = doc["prt"].as<int>();
             }
-            if (doc.containsKey("usr")) {
-                MQ_USERNAME = doc["usr"].as<const char*>();
+            if (doc.containsKey("usr"))
+            {
+                MQ_USERNAME = doc["usr"].as<const char *>();
             }
-            if (doc.containsKey("pwd")) {
-                MQ_PASSWORD = doc["pwd"].as<const char*>();
+            if (doc.containsKey("pwd"))
+            {
+                MQ_PASSWORD = doc["pwd"].as<const char *>();
             }
-        } else {
+        }
+        else
+        {
             Serial.print("JSON parsing failed: ");
             Serial.println(error.c_str());
         }
-    } else {
+    }
+    else
+    {
         Serial.println("Failed to initialize device");
         Serial.println("Restarting ESP...");
         delay(2000);
@@ -217,7 +253,7 @@ void FirmnginKit::begin()
 
     _mqttClient.setServer(MQ_SERVER.c_str(), MQ_PORT);
     _mqttClient.setCallback([this](char *topic, byte *payload, unsigned int length)
-                           { this->mqttCallback(topic, payload, length); });
+                            { this->mqttCallback(topic, payload, length); });
     _mqttClient.setBufferSize(2048);
     _mqttClient.setKeepAlive(60);
     _mqttClient.setSocketTimeout(30);
@@ -225,7 +261,8 @@ void FirmnginKit::begin()
 
 void FirmnginKit::setTimezone(int timezone)
 {
-    if (timezone < -12 || timezone > 12) {
+    if (timezone < -12 || timezone > 12)
+    {
         Serial.println("ERROR: Invalid timezone");
         return;
     }
@@ -243,19 +280,23 @@ void FirmnginKit::setDaylightOffsetSec(int daylightOffsetSec)
     DAYLIGHT_OFFSET_SEC = daylightOffsetSec;
 }
 
-void FirmnginKit::syncTime() {
+void FirmnginKit::syncTime()
+{
     Serial.println("Syncing time");
     configTime(GMT_OFFSET_SEC, DAYLIGHT_OFFSET_SEC, NTP_SERVER);
 
     time_t now = time(nullptr);
-    while (now < 8 * 3600 * 2) {
+    while (now < 8 * 3600 * 2)
+    {
         delay(10);
         now = time(nullptr);
     }
 
-    if (_debug) {
+    if (_debug)
+    {
         struct tm timeinfo;
-        if (getLocalTime(&timeinfo)) {
+        if (getLocalTime(&timeinfo))
+        {
             Serial.print("Current time: ");
             Serial.println(asctime(&timeinfo));
         }
@@ -264,12 +305,15 @@ void FirmnginKit::syncTime() {
 
 void FirmnginKit::loop()
 {
-    if (!PLATFORM_SUPPORTED) {
+    if (!PLATFORM_SUPPORTED)
+    {
         return;
     }
 
-    if (WiFi.status() != WL_CONNECTED) {
-        if (_debug) {
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        if (_debug)
+        {
             Serial.println("WiFi not connected");
         }
         return;
@@ -280,24 +324,30 @@ void FirmnginKit::loop()
     static int backoffDelay = 5000;
     static bool firstConnect = true;
 
-    if (!_mqttClient.connected()) {
+    if (!_mqttClient.connected())
+    {
         unsigned long now = millis();
-        if (now - lastReconnectAttempt > backoffDelay) {
+        if (now - lastReconnectAttempt > backoffDelay)
+        {
             lastReconnectAttempt = now;
             reconnectCount++;
             backoffDelay = min(backoffDelay * 2, 60000);
 
-            if (_debug && !firstConnect) {
+            if (_debug && !firstConnect)
+            {
                 Serial.println("Connection lost, attempting to reconnect...");
             }
 
-            if (connectServer()) {
+            if (connectServer())
+            {
                 reconnectCount = 0;
                 backoffDelay = 5000;
                 firstConnect = false;
             }
         }
-    } else {
+    }
+    else
+    {
         _mqttClient.loop();
     }
 }
@@ -327,7 +377,6 @@ void FirmnginKit::setDebug(bool debug)
     _debug = debug;
 }
 
-
 bool FirmnginKit::isPlatformSupported()
 {
     return PLATFORM_SUPPORTED;
@@ -336,16 +385,20 @@ bool FirmnginKit::isPlatformSupported()
 bool FirmnginKit::connectServer()
 {
     int retryCount = 0;
-    while (!_mqttClient.connected() && retryCount < maxRetryMQTT) {
+    while (!_mqttClient.connected() && retryCount < maxRetryMQTT)
+    {
         unsigned long now = millis();
-        if (now - _lastMQTTAttempt >= _delayRetryMQTT) {
+        if (now - _lastMQTTAttempt >= _delayRetryMQTT)
+        {
             _lastMQTTAttempt = now;
             Serial.print("Connecting to server (attempt ");
             Serial.print(retryCount + 1);
             Serial.println(")");
 
-            if (MQ_USERNAME.length() > 0 && MQ_PASSWORD.length() > 0) {
-                if (_mqttClient.connect(_deviceId, MQ_USERNAME.c_str(), MQ_PASSWORD.c_str())) {
+            if (MQ_USERNAME.length() > 0 && MQ_PASSWORD.length() > 0)
+            {
+                if (_mqttClient.connect(_deviceId, MQ_USERNAME.c_str(), MQ_PASSWORD.c_str()))
+                {
                     _mqttClient.subscribe(getTopicData(_deviceId).c_str(), defaultQos);
                     Serial.println("   __ _                            _             _    _ _   ");
                     Serial.println("  / _(_)_ __ _ __ ___  _ __   __ _(_)_ __       | | _(_) |_ ");
@@ -355,24 +408,29 @@ bool FirmnginKit::connectServer()
                     Serial.println("                             |___/                           ");
                     Serial.println("\nConnected Successfully, let's build amazing things");
                     return true;
-                } else {
+                }
+                else
+                {
                     Serial.println("Connect to Server failed, rc=" + String(_mqttClient.state()));
                     retryCount++;
                 }
-            } else {
+            }
+            else
+            {
                 Serial.println("Connect to Server failed, rc=" + String(_mqttClient.state()));
                 retryCount++;
             }
         }
     }
 
-    if (!_mqttClient.connected()) {
+    if (!_mqttClient.connected())
+    {
         Serial.println("Failed to connect to Server after " + String(maxRetryMQTT) + " attempts");
         Serial.println("Restarting ESP...");
         delay(1000);
         ESP.restart();
     }
-    
+
     return false;
 }
 

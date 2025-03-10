@@ -31,7 +31,8 @@
 #define END_SESSION "on_end_session"
 #define ERROR "on_error"
 
-class Payload {
+class Payload
+{
 private:
     JsonObject _data;
 
@@ -47,43 +48,53 @@ public:
     JsonObject rawData;
     String Metadata;
 
-    bool containsKey(const char* key) const {
+    bool containsKey(const char *key) const
+    {
         return _data.containsKey(key);
     }
 
-    JsonVariant operator[](const char* key) const {
+    JsonVariant operator[](const char *key) const
+    {
         return _data[key];
     }
 
-    void initFromJson(JsonObject data) {
+    void initFromJson(JsonObject data)
+    {
         _data = data;
         rawData = data;
 
-        if (data.containsKey("reference_id")) {
+        if (data.containsKey("reference_id"))
+        {
             referenceId = data["reference_id"].as<String>();
         }
 
-        if (data.containsKey("state")) {
+        if (data.containsKey("state"))
+        {
             EventName = data["state"].as<String>();
         }
 
-        if (data.containsKey("active_session_id")) {
+        if (data.containsKey("active_session_id"))
+        {
             ActiveSessionID = data["active_session_id"].as<int>();
         }
 
-        if (data.containsKey("amount")) {
+        if (data.containsKey("amount"))
+        {
             Amount = data["amount"].as<int>();
         }
 
-        if (data.containsKey("message_id")) {
+        if (data.containsKey("message_id"))
+        {
             MessageId = data["message_id"].as<int>();
         }
 
-        if (data.containsKey("option_name")) {
+        if (data.containsKey("option_name"))
+        {
             Optionname = data["option_name"].as<String>();
         }
 
-        if (data.containsKey("metadata")) {
+        if (data.containsKey("metadata"))
+        {
             Metadata = data["metadata"].as<String>();
         }
     }
@@ -102,8 +113,10 @@ public:
     String Optionname;
     String Metadata; // JSON string containing additional metadata
 
-    void on(const char* event, EventHandlerFunction handler) {
-        if (EventName == event) {
+    void on(const char *event, EventHandlerFunction handler)
+    {
+        if (EventName == event)
+        {
             DynamicJsonDocument doc(1024);
             deserializeJson(doc, Metadata);
             JsonObject jsonObj = doc.as<JsonObject>();
@@ -116,7 +129,7 @@ public:
     }
 };
 
-typedef void (*CallbackFunction)(Callback&);
+typedef void (*CallbackFunction)(Callback &);
 
 class FirmnginKit
 {
@@ -134,7 +147,6 @@ public:
     FirmnginKit &endSession();
 
 private:
-
     const char *_deviceId;
     const char *_deviceKey;
     bool _debug;
@@ -151,7 +163,7 @@ private:
     unsigned long _delayRetryMQTT = 5000;
     int maxRetryMQTT = 3;
     int defaultQos = 1;
-    bool initializingDevice(const char* url, String& response, const char* method = "GET", String payload = "");
+    bool initializingDevice(const char *url, String &response, const char *method = "GET", String payload = "");
     void _Debug(String message, bool newLine = true);
     bool connectServer();
     void mqttCallback(char *topic, byte *payload, unsigned int length);

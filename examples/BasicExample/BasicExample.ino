@@ -1,5 +1,18 @@
+/*
+    BasicExample
+
+    Basic example for firmnginKit library.
+
+
+    Created 09 March 2025
+    By Arif
+
+    https://kit.firmngin.cloud
+
+*/
+
 #include "firmnginKit.h"
-#include <WiFi.h>
+#include "WiFi.h"
 
 #define DEVICE_ID "FNG_YOUR_DEVICE_ID"
 #define DEVICE_KEY "FNG_YOUR_DEVICE_KEY"
