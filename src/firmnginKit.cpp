@@ -50,6 +50,7 @@ FirmnginKit::FirmnginKit(const char *deviceId, const char *deviceKey)
       _debug(false),
       _noCallback(false),
       _lastMQTTAttempt(0),
+      _lastHeartbeat(0),
       _mqttClient(_wifiClient)
 {
     if (!PLATFORM_SUPPORTED)
@@ -173,6 +174,22 @@ String FirmnginKit::setTopicCallback(String deviceId)
     return topic;
 }
 
+String FirmnginKit::setTopicHeartbeat(String deviceId)
+{
+    String topic = MQTT_TOPIC_PREFIX;
+    topic += deviceId;
+    topic += "/hb";
+    return topic;
+}
+
+String FirmnginKit::setTopicLastWill(String deviceId)
+{
+    String topic = MQTT_TOPIC_PREFIX;
+    topic += deviceId;
+    topic += "/lw";
+    return topic;
+}
+
 String FirmnginKit::getTopicData(String deviceId)
 {
     String topic = MQTT_TOPIC_PREFIX;
@@ -205,7 +222,8 @@ void FirmnginKit::begin()
 
     String response;
     Serial.println("Initializing device");
-    if (initializingDevice(("https://dev.firmngin.cloud/v1/device/init/" + String(_deviceId)).c_str(), response))
+    String url = String(BASE_URL) + "/v1/device/init/" + String(_deviceId);
+    if (initializingDevice(url.c_str(), response))
     {
 
         DynamicJsonDocument doc(4096);
@@ -255,8 +273,8 @@ void FirmnginKit::begin()
     _mqttClient.setCallback([this](char *topic, byte *payload, unsigned int length)
                             { this->mqttCallback(topic, payload, length); });
     _mqttClient.setBufferSize(2048);
-    _mqttClient.setKeepAlive(60);
-    _mqttClient.setSocketTimeout(30);
+    _mqttClient.setKeepAlive(25);
+    _mqttClient.setSocketTimeout(25);
 }
 
 void FirmnginKit::setTimezone(int timezone)
@@ -349,6 +367,11 @@ void FirmnginKit::loop()
     else
     {
         _mqttClient.loop();
+        unsigned long currentMillis = millis();
+        if (currentMillis - _lastHeartbeat >= _heartbeatInterval) {
+            _lastHeartbeat = currentMillis;
+            sendHeartbeat();
+        }
     }
 }
 
@@ -397,8 +420,17 @@ bool FirmnginKit::connectServer()
 
             if (MQ_USERNAME.length() > 0 && MQ_PASSWORD.length() > 0)
             {
-                if (_mqttClient.connect(_deviceId, MQ_USERNAME.c_str(), MQ_PASSWORD.c_str()))
+                String topicLw = setTopicLastWill(_deviceId);
+
+                if (_mqttClient.connect(_deviceId, 
+                    MQ_USERNAME.c_str(), 
+                    MQ_PASSWORD.c_str(),
+                    topicLw.c_str(),
+                    0,
+                    true,
+                    "offline"))
                 {
+                    _mqttClient.publish(topicLw.c_str(), "online", true);
                     _mqttClient.subscribe(getTopicData(_deviceId).c_str(), defaultQos);
                     Serial.println("   __ _                            _             _    _ _   ");
                     Serial.println("  / _(_)_ __ _ __ ___  _ __   __ _(_)_ __       | | _(_) |_ ");
@@ -530,4 +562,12 @@ FirmnginKit &FirmnginKit::endSession()
         }
     }
     return *this;
+}
+
+void FirmnginKit::sendHeartbeat() 
+{
+    if (_mqttClient.connected()) {
+        String topic = setTopicHeartbeat(_deviceId);
+        _mqttClient.publish(topic.c_str(), "1");
+    }
 }

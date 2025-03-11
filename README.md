@@ -6,14 +6,15 @@ Check this out [kit.firmngin.cloud](https://kit.firmngin.cloud) for more informa
 
 ## Features
 
-- ESP8266 (Soon) and ESP32 support
+- ESP8266 and ESP32 support
 - Auto reconnect to server
 - Event-driven callback system
 
 ## Installation
 
 1. Make sure you're using an ESP8266 or ESP32 board
-2. Install required library dependencies:
+2. Search library "firmnginKit" on Library Manager and install. [Click here to Learn how to install Arduino Library](https://docs.arduino.cc/software/ide-v1/tutorials/installing-libraries/)
+3. Install required library dependencies:
    - ArduinoJson
    - PubSubClient
 
@@ -78,7 +79,7 @@ Each event callback receives a Payload object containing:
 ## Configuration
 
 ```cpp
-// Set timezone (default +7 for Indonesia)
+// Set timezone (default is +7 Indonesia)
 fngin.setTimezone(7);
 
 // Enable/disable debug mode
