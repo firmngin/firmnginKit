@@ -1,0 +1,47 @@
+// =========================================================================
+// keys.h - TEMPLATE FILE
+// =========================================================================
+// INSTRUCTIONS:
+// 1. Copy this file to your sketch folder (same folder as your .ino file)
+// 2. Rename it to "keys.h"
+// 3. Fill in your certificates and credentials
+// 4. DO NOT commit keys.h to version control!
+// =========================================================================
+
+#ifndef KEYS_H
+#define KEYS_H
+
+// MQTT Server Configuration (Optional - override default from library)
+// Default: asia-jkt1.firmngin.dev:8883
+// Uncomment to use custom server:
+// static const char* mqtt_server = "your-custom-server.com";
+// static const int mqtt_port = 8883;
+
+// CA Certificate (PEM format) - For server validation
+static const char CA_CERT[] PROGMEM = R"EOF(
+-----BEGIN CERTIFICATE-----
+[Your CA Certificate Here]
+-----END CERTIFICATE-----
+)EOF";
+
+// Client Certificate (PEM format) - For client authentication (mTLS)
+static const char CLIENT_CERT[] PROGMEM = R"EOF(
+-----BEGIN CERTIFICATE-----
+[Your Client Certificate Here]
+-----END CERTIFICATE-----
+)EOF";
+
+// Private Key (PEM format) - For client authentication (mTLS)
+static const char PRIVATE_KEY[] PROGMEM = R"EOF(
+-----BEGIN PRIVATE KEY-----
+[Your Private Key Here]
+-----END PRIVATE KEY-----
+)EOF";
+
+// Server Fingerprint (SHA1 - 20 bytes) - For ESP8266 server validation
+static const uint8_t SERVER_FINGERPRINT_BYTES[20] PROGMEM = {
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
+#endif // KEYS_H
